@@ -1,50 +1,56 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+  Sync Impact Report:
+  - Version change: [none] → 1.0.0
+  - Added principles: Code Quality, Testing Standards, User Experience Consistency, Performance Requirements, Simplicity & Maintainability
+  - Added sections: Security & Compliance, Development Workflow
+  - Template pending review: .specify/templates/plan-template.md, spec-template.md, tasks-template.md
+  - All placeholders resolved.
+-->
+# SpecTest Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Code Quality
+Every code change MUST conform to project linting and formatting rules, pass static analysis, and maintain or improve existing test coverage. Code duplication MUST be eliminated — reviewers MUST reject PRs with unexplained duplication. All public APIs MUST include typed documentation (JSDoc/TSDoc). Dead code MUST NOT be committed. Complexity budgets: max 40 lines per function, cyclomatic complexity ≤ 7, module coupling kept minimal.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### II. Testing Standards
+Testing is NON-NEGOTIABLE. Three tiers are REQUIRED:
+- **Unit tests**: MUST cover all business logic in isolation (no I/O, no network).
+- **Integration tests**: MUST cover every boundary crossing (database queries, API calls, filesystem, external services).
+- **E2E tests**: MUST cover every critical user journey end-to-end.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+Coverage MUST NOT regress below 80%. All tests MUST be deterministic, isolated, and run in CI. Flaky tests MUST be quarantined or fixed immediately. TDD (Red-Green-Refactor) is strongly preferred for all new feature work.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### III. User Experience Consistency
+All user-facing interfaces MUST adhere to the project's design system (component library, color tokens, spacing, typography). Every interactive element MUST handle four states: default, hover/focus, active, disabled. Error, loading, and empty states MUST be implemented for every data-driven component. Accessibility is REQUIRED: no keyboard traps, proper ARIA labels, sufficient color contrast (WCAG AA minimum), and semantic HTML. Responsive breakpoints MUST follow the defined grid. Consistency across pages/screens is measured through visual regression testing.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### IV. Performance Requirements
+Features MUST meet defined budgets enforced in CI:
+- Lighthouse scores ≥ 90 for all categories.
+- First Contentful Paint (FCP) ≤ 1.5s.
+- Time to Interactive (TTI) ≤ 3.5s on mobile 3G throttling.
+- Bundle size budgets set per-page — violations fail the build.
+- Database queries MUST be N+1 free and use proper indexing.
+- API endpoint p95 latency MUST stay under 200ms.
+- Assets (images, fonts, scripts) MUST be compressed and lazy-loaded where applicable.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+### V. Simplicity & Maintainability
+Apply YAGNI rigorously — build only what the current specification requires, not what might be needed later. Prefer composition over inheritance. Modules MUST have a single, well-defined responsibility. Every dependency addition MUST be justified in the PR description. Configuration over code where feasible. Refactoring is encouraged as part of every feature — leave code cleaner than you found it (Boy Scout Rule).
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+## Security & Compliance
+Credentials, secrets, and tokens MUST NEVER be committed — use environment variables or a secrets manager. All user inputs MUST be validated and sanitized. API endpoints MUST enforce authentication and authorization. Dependencies MUST be scanned for known vulnerabilities in CI. Compliance with regional regulations (e.g., GDPR, LGPD) MUST be confirmed before storing personal data.
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+## Development Workflow
+All changes flow through PRs with required reviews. A PR MUST NOT merge unless:
+- All tests pass in CI.
+- No lint or type errors.
+- No performance budget violations.
+- At least one approval from a qualified reviewer.
+- The PR description explains what, why, and any trade-offs made.
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+Feature branches MUST be short-lived (≤ 3 days). Commits SHOULD be atomic and follow conventional commit format.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
+This constitution supersedes all ad-hoc practices. Amendments require a documented proposal, team review, and migration plan. The constitution is reviewed quarterly. All PRs and reviews MUST verify compliance with these principles.
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
-
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Version**: 1.0.0 | **Ratified**: 2026-06-06 | **Last Amended**: 2026-06-06
