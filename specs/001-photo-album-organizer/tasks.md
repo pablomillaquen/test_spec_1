@@ -30,8 +30,8 @@ description: "Task list for Photo Album Organizer feature implementation"
 
 **Purpose**: Project initialization and basic structure
 
-- [ ] T001 Initialize Vite vanilla JS project — `npm create vite@latest . -- --template vanilla`, then `npm install sql.js`, `npm install -D vitest @playwright/test eslint`
-- [ ] T002 [P] Create project directory structure: `src/lib/`, `tests/unit/`, `tests/integration/`, `tests/e2e/`
+- [x] T001 Initialize Vite vanilla JS project — `npm create vite@latest . -- --template vanilla`, then `npm install sql.js`, `npm install -D vitest @playwright/test eslint`
+- [x] T002 [P] Create project directory structure: `src/lib/`, `tests/unit/`, `tests/integration/`, `tests/e2e/`
 
 ---
 
@@ -41,10 +41,10 @@ description: "Task list for Photo Album Organizer feature implementation"
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T003 Implement SQLite database initialization, schema creation (albums + photos tables), and IndexedDB persistence in `src/db.js`
-- [ ] T004 [P] Implement IndexedDB blob store (save/load/delete blobs) in `src/db.js`
-- [ ] T005 [P] Create base CSS with design tokens (colors, spacing, typography, breakpoints) in `src/style.css`
-- [ ] T006 [P] Copy sql.js WASM binary from node_modules to `src/lib/sql-wasm.wasm`
+- [x] T003 Implement SQLite database initialization, schema creation (albums + photos tables), and IndexedDB persistence in `src/db.js`
+- [x] T004 [P] Implement IndexedDB blob store (save/load/delete blobs) in `src/db.js`
+- [x] T005 [P] Create base CSS with design tokens (colors, spacing, typography, breakpoints) in `src/style.css`
+- [x] T006 [P] Copy sql.js WASM binary from node_modules to `src/lib/sql-wasm.wasm`
 
 **Checkpoint**: Foundation ready — user story implementation can now begin in parallel
 
@@ -64,9 +64,9 @@ description: "Task list for Photo Album Organizer feature implementation"
 
 ### Implementation for User Story 1
 
-- [ ] T010 [P] [US1] Create `src/index.html` with album grid layout skeleton (date group headers, album tiles container, empty state template)
-- [ ] T011 [US1] Implement main page renderer in `src/render.js` — `renderAlbumGrid(albums)` function: group by `date_group`, render `<h2>` headers and `<article>` tiles with name/cover/count
-- [ ] T012 [US1] Implement app entry point in `src/main.js` — async init: load sql.js WASM, initialize DB, render main page
+- [x] T010 [P] [US1] Create `src/index.html` with album grid layout skeleton (date group headers, album tiles container, empty state template)
+- [x] T011 [US1] Implement main page renderer in `src/render.js` — `renderAlbumGrid(albums)` function: group by `date_group`, render `<h2>` headers and `<article>` tiles with name/cover/count
+- [x] T012 [US1] Implement app entry point in `src/main.js` — async init: load sql.js WASM, initialize DB, render main page
 
 **Checkpoint**: At this point, User Story 1 should be fully functional — albums display grouped by date on the main page.
 
@@ -86,11 +86,11 @@ description: "Task list for Photo Album Organizer feature implementation"
 
 ### Implementation for User Story 2
 
-- [ ] T016 [P] [US2] Create `src/album.html` with photo tile grid layout (figure elements, lightbox container, empty state, upload button)
-- [ ] T017 [US2] Implement album detail renderer in `src/render.js` — `renderPhotoGrid(photos)` function: grid of `<figure>` tiles with thumbnails, filename captions
-- [ ] T018 [P] [US2] Implement photo import in `src/import.js` — File API handler, validate mime type and file size, generate thumbnail via `<canvas>`, save blob to IndexedDB, insert metadata row in SQLite
-- [ ] T019 [US2] Implement lightbox in `src/lightbox.js` — full-size image overlay with close button, backdrop click to dismiss
-- [ ] T020 [US2] Wire up page routing in `src/main.js` — navigate from album tile click to album detail page (`?id=<album_id>`), back button returns to main page
+- [x] T016 [P] [US2] Create `src/album.html` with photo tile grid layout (figure elements, lightbox container, empty state, upload button)
+- [x] T017 [US2] Implement album detail renderer in `src/render.js` — `renderPhotoGrid(photos)` function: grid of `<figure>` tiles with thumbnails, filename captions
+- [x] T018 [P] [US2] Implement photo import in `src/import.js` — File API handler, validate mime type and file size, generate thumbnail via `<canvas>`, save blob to IndexedDB, insert metadata row in SQLite
+- [x] T019 [US2] Implement lightbox in `src/lightbox.js` — full-size image overlay with close button, backdrop click to dismiss
+- [x] T020 [US2] Wire up page routing in `src/main.js` — navigate from album tile click to album detail page (`?id=<album_id>`), back button returns to main page
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently.
 
@@ -109,8 +109,8 @@ description: "Task list for Photo Album Organizer feature implementation"
 
 ### Implementation for User Story 3
 
-- [ ] T023 [P] [US3] Implement drag and drop handlers in `src/drag.js` — `dragstart`, `dragover` (with visual insertion indicator), `drop` (reorder albums and persist), `dragend` cleanup. Export `initDragDrop(container)` function.
-- [ ] T024 [US3] Integrate drag-and-drop into main page — call `initDragDrop()` from `src/main.js`, wire drop handler to `db.reorderAlbums()` and re-render grid
+- [x] T023 [P] [US3] Implement drag and drop handlers in `src/drag.js` — `dragstart`, `dragover` (with visual insertion indicator), `drop` (reorder albums and persist), `dragend` cleanup. Export `initDragDrop(container)` function.
+- [x] T024 [US3] Integrate drag-and-drop into main page — call `initDragDrop()` from `src/main.js`, wire drop handler to `db.reorderAlbums()` and re-render grid
 
 **Checkpoint**: All three user stories should now be independently functional.
 
@@ -129,9 +129,9 @@ description: "Task list for Photo Album Organizer feature implementation"
 
 ### Implementation for User Story 4
 
-- [ ] T027 [US4] Add "New Album" button and inline creation flow to main page — prompt for name, call `db.createAlbum()`, re-render grid
-- [ ] T028 [P] [US4] Add album rename (click-to-edit inline) and delete (confirmation dialog) actions on album tiles in `src/render.js` and `src/main.js`
-- [ ] T029 [US4] Add "Add Photos" (file input) and "Remove Photo" (button on tile/lightbox) to album detail page in `src/main.js`, wire to `import.js` and `db.removePhoto()`
+- [x] T027 [US4] Add "New Album" button and inline creation flow to main page — prompt for name, call `db.createAlbum()`, re-render grid
+- [x] T028 [P] [US4] Add album rename (click-to-edit inline) and delete (confirmation dialog) actions on album tiles in `src/render.js` and `src/main.js`
+- [x] T029 [US4] Add "Add Photos" (file input) and "Remove Photo" (button on tile/lightbox) to album detail page in `src/main.js`, wire to `import.js` and `db.removePhoto()`
 
 **Checkpoint**: All four user stories are complete and independently functional.
 

@@ -1,0 +1,24 @@
+{
+  "name": "photo-album-organizer",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "lint": "eslint src/"
+  },
+  "dependencies": {
+    "sql.js": "^1.14.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.60.0",
+    "eslint": "^10.4.1",
+    "vite": "^8.0.16",
+    "vitest": "^4.1.8"
+  }
+}

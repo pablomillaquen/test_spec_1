@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Photo Album Organizer</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <header class="app-header">
+    <h1>Photo Albums</h1>
+    <button class="btn btn-primary" id="new-album-btn">+ New Album</button>
+  </header>
+  <main class="main-content" id="main-content">
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+      <p>Initializing database...</p>
+      <div class="loading-bar"><div class="loading-bar-fill"></div></div>
+    </div>
+  </main>
+  <script type="module" src="/main.js"></script>
+</body>
+</html>
