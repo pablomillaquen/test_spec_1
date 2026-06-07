@@ -1,70 +1,57 @@
 import { initDatabase, createAlbum, getAlbums, getAlbumById, getPhotos, renameAlbum, deleteAlbum, reorderAlbums, removePhoto } from './db.js';
-import { renderAlbumGrid, renderPhotoGrid, showLoading } from './render.js';
+import { renderAlbumGrid, renderPhotoGrid } from './render.js';
 import { importPhotos } from './import.js';
 
 async function init() {
   await initDatabase();
+
   const params = new URLSearchParams(window.location.search);
   if (window.location.pathname.endsWith('album.html') && params.has('id')) {
-    await renderAlbumView(params.get('id'));
+    setupAlbumPage(params.get('id'));
   } else {
-    await renderMainView();
+    setupMainPage();
   }
+}
+
+function setupMainPage() {
+  document.getElementById('new-album-btn')?.addEventListener('click', handleCreateAlbum);
+
+  renderMainView();
 }
 
 async function renderMainView() {
   const albums = getAlbums();
-  renderAlbumGrid(albums, handleReorder);
-  setupMainEventListeners();
+  renderAlbumGrid(albums, {
+    onReorder: handleReorder,
+    onCreateAlbum: handleCreateAlbum,
+    onRenameAlbum: handleRenameAlbum,
+    onDeleteAlbum: handleDeleteAlbum,
+  });
 }
 
-function setupMainEventListeners() {
-  document.addEventListener('create-album', () => {
-    const name = prompt('Album name:');
-    if (name && name.trim()) {
-      createAlbum(name.trim());
-      renderMainView();
-    }
-  });
-
-  document.getElementById('new-album-btn')?.addEventListener('click', () => {
-    document.dispatchEvent(new CustomEvent('create-album'));
-  });
-
-  document.addEventListener('rename-album', (e) => {
-    renameAlbum(e.detail.id, e.detail.name);
-  });
-
-  document.addEventListener('delete-album', (e) => {
-    deleteAlbum(e.detail.id);
+function handleCreateAlbum() {
+  const name = prompt('Album name:');
+  if (name && name.trim()) {
+    createAlbum(name.trim());
     renderMainView();
-  });
+  }
+}
+
+function handleRenameAlbum(id, name) {
+  renameAlbum(id, name);
+}
+
+function handleDeleteAlbum(id) {
+  deleteAlbum(id);
+  renderMainView();
 }
 
 function handleReorder(albumIds) {
   reorderAlbums(albumIds);
-  const albums = getAlbums();
-  renderAlbumGrid(albums, handleReorder);
-  setupMainEventListeners();
+  renderMainView();
 }
 
-async function renderAlbumView(albumId) {
-  const album = getAlbumById(albumId);
-  if (!album) {
-    document.getElementById('album-content').innerHTML = `
-      <div class="empty-state">
-        <h2>Album not found</h2>
-        <p><a href="/index.html" class="back-link">Back to albums</a></p>
-      </div>
-    `;
-    return;
-  }
-  const photos = getPhotos(albumId);
-  renderPhotoGrid(photos, album.name);
-  setupAlbumEventListeners(albumId);
-}
-
-function setupAlbumEventListeners(albumId) {
+function setupAlbumPage(albumId) {
   document.getElementById('back-btn')?.addEventListener('click', () => {
     window.location.href = '/index.html';
   });
@@ -83,14 +70,30 @@ function setupAlbumEventListeners(albumId) {
     input.click();
   });
 
-  document.addEventListener('add-photos', async (e) => {
-    await importPhotos(albumId, e.detail.files);
-    renderAlbumView(albumId);
-  });
+  renderAlbumView(albumId);
+}
 
-  document.addEventListener('remove-photo', (e) => {
-    removePhoto(e.detail.id);
-    renderAlbumView(albumId);
+async function renderAlbumView(albumId) {
+  const album = getAlbumById(albumId);
+  if (!album) {
+    document.getElementById('album-content').innerHTML = `
+      <div class="empty-state">
+        <h2>Album not found</h2>
+        <p><a href="/index.html" class="back-link">Back to albums</a></p>
+      </div>
+    `;
+    return;
+  }
+  const photos = getPhotos(albumId);
+  renderPhotoGrid(photos, album.name, {
+    onAddPhotos: async (files) => {
+      await importPhotos(albumId, files);
+      renderAlbumView(albumId);
+    },
+    onRemovePhoto: (photoId) => {
+      removePhoto(photoId);
+      renderAlbumView(albumId);
+    },
   });
 }
 

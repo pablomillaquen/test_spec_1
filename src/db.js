@@ -1,4 +1,5 @@
 import initSqlJs from 'sql.js';
+import sqlWasmUrl from './lib/sql-wasm.wasm?url';
 
 const DB_NAME = 'photo_album_organizer';
 const BLOB_STORE_NAME = 'photo_blobs';
@@ -31,7 +32,7 @@ function openIndexedDB() {
 
 export async function initDatabase() {
   const SQL = await initSqlJs({
-    locateFile: (file) => `/lib/${file}`,
+    locateFile: () => sqlWasmUrl,
   });
   idb = await openIndexedDB();
   const saved = await loadDbFromIndexedDB();

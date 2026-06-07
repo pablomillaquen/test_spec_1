@@ -1,17 +1,11 @@
-import { getPhotoById, getPhotos, loadBlob } from './db.js';
+import { getPhotoById, loadBlob } from './db.js';
 import { initDragDrop } from './drag.js';
 import { openLightbox } from './lightbox.js';
 
 const loadedUrls = new Map();
 
-function getCachedUrl(blobId) {
-  if (loadedUrls.has(blobId)) return loadedUrls.get(blobId);
-  return null;
-}
-
 async function loadImageUrl(blobId) {
-  const cached = getCachedUrl(blobId);
-  if (cached) return cached;
+  if (loadedUrls.has(blobId)) return loadedUrls.get(blobId);
   const blob = await loadBlob(blobId);
   if (!blob) return null;
   const url = URL.createObjectURL(blob);
@@ -19,14 +13,8 @@ async function loadImageUrl(blobId) {
   return url;
 }
 
-function revokeUrl(blobId) {
-  if (loadedUrls.has(blobId)) {
-    URL.revokeObjectURL(loadedUrls.get(blobId));
-    loadedUrls.delete(blobId);
-  }
-}
-
-export function renderAlbumGrid(albums, onReorder) {
+export function renderAlbumGrid(albums, callbacks) {
+  const { onReorder, onCreateAlbum, onRenameAlbum, onDeleteAlbum } = callbacks;
   const container = document.getElementById('main-content');
   if (!albums || albums.length === 0) {
     container.innerHTML = `
@@ -37,10 +25,7 @@ export function renderAlbumGrid(albums, onReorder) {
         <button class="btn btn-primary" id="empty-create-btn">+ Create Album</button>
       </div>
     `;
-    const btn = container.querySelector('#empty-create-btn');
-    if (btn) btn.addEventListener('click', () => {
-      document.dispatchEvent(new CustomEvent('create-album'));
-    });
+    container.querySelector('#empty-create-btn')?.addEventListener('click', onCreateAlbum);
     return;
   }
 
@@ -67,20 +52,18 @@ export function renderAlbumGrid(albums, onReorder) {
 
   container.innerHTML = html;
 
-  const grids = container.querySelectorAll('.album-grid');
-  grids.forEach((grid) => {
+  container.querySelectorAll('.album-grid').forEach((grid) => {
     initDragDrop(grid, albums, onReorder);
   });
 
-  document.querySelectorAll('.album-tile').forEach((tile) => {
+  container.querySelectorAll('.album-tile').forEach((tile) => {
     tile.addEventListener('click', (e) => {
       if (e.target.closest('.album-actions')) return;
-      const albumId = tile.dataset.albumId;
-      window.location.href = `/album.html?id=${albumId}`;
+      window.location.href = `/album.html?id=${tile.dataset.albumId}`;
     });
   });
 
-  document.querySelectorAll('.rename-btn').forEach((btn) => {
+  container.querySelectorAll('.rename-btn').forEach((btn) => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       const tile = btn.closest('.album-tile');
@@ -96,7 +79,7 @@ export function renderAlbumGrid(albums, onReorder) {
       const finishRename = () => {
         const newName = input.value.trim() || currentName;
         const albumId = tile.dataset.albumId;
-        document.dispatchEvent(new CustomEvent('rename-album', { detail: { id: albumId, name: newName } }));
+        onRenameAlbum(albumId, newName);
         const span = document.createElement('span');
         span.className = 'album-name';
         span.textContent = newName;
@@ -110,7 +93,7 @@ export function renderAlbumGrid(albums, onReorder) {
     });
   });
 
-  document.querySelectorAll('.delete-btn').forEach((btn) => {
+  container.querySelectorAll('.delete-btn').forEach((btn) => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       const tile = btn.closest('.album-tile');
@@ -119,9 +102,7 @@ export function renderAlbumGrid(albums, onReorder) {
       showConfirmDialog(
         'Delete Album',
         `Are you sure you want to delete "${albumName}" and all its photos?`,
-        () => {
-          document.dispatchEvent(new CustomEvent('delete-album', { detail: { id: albumId } }));
-        },
+        () => onDeleteAlbum(albumId),
       );
     });
   });
@@ -152,7 +133,8 @@ function renderAlbumTile(album) {
   `;
 }
 
-export function renderPhotoGrid(photos, albumName) {
+export function renderPhotoGrid(photos, albumName, callbacks) {
+  const { onAddPhotos, onRemovePhoto } = callbacks;
   const container = document.getElementById('album-content');
   const titleEl = document.getElementById('album-title');
   if (titleEl) titleEl.textContent = albumName || 'Album';
@@ -168,7 +150,7 @@ export function renderPhotoGrid(photos, albumName) {
         <p>Add some photos to get started.</p>
       </div>
     `;
-    setupUploadZone(container);
+    setupUploadZone(container, onAddPhotos);
     return;
   }
 
@@ -185,7 +167,7 @@ export function renderPhotoGrid(photos, albumName) {
   html += `</div>`;
   container.innerHTML = html;
 
-  setupUploadZone(container);
+  setupUploadZone(container, onAddPhotos);
 
   container.querySelectorAll('.photo-tile').forEach((tile) => {
     tile.addEventListener('click', () => {
@@ -197,7 +179,7 @@ export function renderPhotoGrid(photos, albumName) {
             const url = URL.createObjectURL(blob);
             openLightbox(url, photo.filename, () => {
               URL.revokeObjectURL(url);
-              document.dispatchEvent(new CustomEvent('remove-photo', { detail: { id: photoId } }));
+              onRemovePhoto(photoId);
             });
           }
         });
@@ -215,7 +197,7 @@ export function renderPhotoGrid(photos, albumName) {
   });
 }
 
-function setupUploadZone(container) {
+function setupUploadZone(container, onAddPhotos) {
   const zone = container.querySelector('#upload-zone');
   if (!zone) return;
   zone.addEventListener('click', () => {
@@ -225,7 +207,7 @@ function setupUploadZone(container) {
     input.multiple = true;
     input.addEventListener('change', () => {
       if (input.files.length > 0) {
-        document.dispatchEvent(new CustomEvent('add-photos', { detail: { files: Array.from(input.files) } }));
+        onAddPhotos(Array.from(input.files));
       }
     });
     input.click();
@@ -238,22 +220,8 @@ function setupUploadZone(container) {
     const files = Array.from(e.dataTransfer.files).filter((f) =>
       ['image/jpeg', 'image/png', 'image/gif', 'image/webp'].includes(f.type)
     );
-    if (files.length > 0) {
-      document.dispatchEvent(new CustomEvent('add-photos', { detail: { files } }));
-    }
+    if (files.length > 0) onAddPhotos(files);
   });
-}
-
-export function showLoading(containerId) {
-  const container = document.getElementById(containerId);
-  if (container) {
-    container.innerHTML = `
-      <div class="loading">
-        <div class="spinner"></div>
-        <p>Loading...</p>
-      </div>
-    `;
-  }
 }
 
 export function showConfirmDialog(title, message, onConfirm) {

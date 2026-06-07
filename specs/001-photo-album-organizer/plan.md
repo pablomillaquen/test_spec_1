@@ -88,7 +88,7 @@ src/
 ├── drag.js              # HTML5 Drag & Drop handlers for album reordering
 ├── lightbox.js          # Full-size photo lightbox overlay
 └── lib/
-    └── sql-wasm.wasm    # sql.js WASM binary (loaded at runtime)
+    └── sql-wasm.wasm    # sql.js WASM binary (imported via `?url`)
 ```
 
 ## Complexity Tracking
